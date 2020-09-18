@@ -1,3 +1,5 @@
+![Test & Build](https://github.com/abergmeier/winsible/workflows/Test%20&%20Build/badge.svg)
+
 # winsible
 Installer similar to Ansible but running on Windows!
 
