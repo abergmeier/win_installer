@@ -6,12 +6,8 @@ import (
 	"github.com/abergmeier/winsible/internal/executor"
 )
 
-var (
-	bucket = flag.String("bucket", "", "Bucket to download files from")
-)
-
 func main() {
 	flag.Parse()
-	config := mustReadConfig(*bucket)
+	config := mustReadConfig()
 	executor.MustRun(config)
 }
