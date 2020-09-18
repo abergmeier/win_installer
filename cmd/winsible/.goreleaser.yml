@@ -1,0 +1,13 @@
+# .goreleaser.yml
+builds:
+  - binary: winsible
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format: binary
