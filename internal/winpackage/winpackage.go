@@ -5,20 +5,26 @@ import (
 	"os/exec"
 
 	"github.com/abergmeier/winsible/internal/winreg"
+	"github.com/gonuts/go-shellquote"
 )
 
 func Run(config map[string]interface{}) {
 	path := config["path"].(string)
 	productID := config["product_id"].(string)
-	arguments := config["arguments"].(string)
+	argumentString := config["arguments"].(string)
 
 	if winreg.Installed(productID) {
 		return
 	}
 
-	c := exec.Command(path, arguments)
+	arguments, err := shellquote.Split(argumentString)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	err := c.Run()
+	c := exec.Command(path, arguments...)
+
+	err = c.Run()
 	if err != nil {
 		log.Fatal(err)
 	}
