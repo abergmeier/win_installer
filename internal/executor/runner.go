@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/abergmeier/winsible/internal/gcstorage"
+	"github.com/abergmeier/winsible/internal/winpackage"
 )
 
 func MustRun(config []interface{}) {
@@ -12,19 +13,23 @@ func MustRun(config []interface{}) {
 		taskConfig := c.(map[string]interface{})
 
 		var vConfig map[string]interface{}
+		var run func(map[string]interface{})
 
 		for k, v := range taskConfig {
+			vConfig = v.(map[string]interface{})
 			if k == "gc_storage" {
-				vConfig = v.(map[string]interface{})
+				run = gcstorage.Run
+			} else if k == "win_package" {
+				run = winpackage.Run
 			}
 
-			if vConfig != nil {
+			if run != nil {
 				break
 			}
 		}
 
 		fmt.Printf("TASK [%s] ***\n", taskConfig["name"])
-		gcstorage.Run(vConfig)
+		run(vConfig)
 	}
 
 }
