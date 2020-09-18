@@ -2,11 +2,14 @@ package gcstorage
 
 import (
 	"context"
+	"crypto/md5"
+	"errors"
 	"io"
 	"log"
 	"os"
 
 	"cloud.google.com/go/storage"
+	"github.com/abergmeier/winsible/internal/filehash"
 )
 
 func Run(config map[string]interface{}) {
@@ -30,6 +33,20 @@ func Run(config map[string]interface{}) {
 	bucket := client.Bucket(bucketName)
 
 	obj := bucket.Object(objectPath)
+	attrs, err := obj.Attrs(ctx)
+	if err == nil {
+		downloaded, err := isDownloaded(dest, attrs.MD5)
+		if err == nil {
+			if downloaded {
+				return // Already done
+			}
+		} else {
+			log.Print("Could not check local MD5 - falling back to downloading")
+		}
+	} else {
+		log.Print("Could not check remote MD5 - falling back to downloading")
+	}
+
 	rdr, err := obj.NewReader(ctx)
 	if err != nil {
 		log.Fatal(err)
@@ -48,4 +65,19 @@ func Run(config map[string]interface{}) {
 	}
 
 	w.Sync()
+}
+
+func isDownloaded(dest string, md5Hash []byte) (bool, error) {
+	r, err := os.Open(dest)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return false, nil
+		}
+		return false, err
+	}
+	defer r.Close()
+	expectedHash := [md5.Size]byte{}
+	copy(expectedHash[:], md5Hash)
+	downloaded, err := filehash.ReaderHasMD5(r, expectedHash)
+	return downloaded, err
 }
