@@ -1,2 +1,2 @@
-# win_installer
+# winsible
 Installer similar to crappy Ansible but working on Windows.
