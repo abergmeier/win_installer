@@ -1,7 +1,6 @@
 package gcstorage
 
 import (
-	"compress/gzip"
 	"context"
 	"io"
 	"log"
@@ -30,18 +29,12 @@ func Run(config map[string]interface{}) {
 
 	bucket := client.Bucket(bucketName)
 
-	obj := bucket.Object(objectPath).ReadCompressed(true)
+	obj := bucket.Object(objectPath)
 	rdr, err := obj.NewReader(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rdr.Close()
-
-	gzr, err := gzip.NewReader(rdr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer gzr.Close()
 
 	w, err := os.Create(dest)
 	if err != nil {
@@ -49,7 +42,7 @@ func Run(config map[string]interface{}) {
 	}
 	defer w.Close()
 
-	_, err = io.Copy(w, gzr)
+	_, err = io.Copy(w, rdr)
 	if err != nil {
 		log.Fatal(err)
 	}
