@@ -23,3 +23,19 @@ func ReadYaml(r io.Reader) []interface{} {
 
 	return tasks
 }
+
+func ReadYamlFile(filename string) []interface{} {
+
+	content, err := ioutil.ReadFile(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var tasks []interface{}
+	err = yaml.Unmarshal(content, &tasks)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return tasks
+}
