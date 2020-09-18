@@ -10,16 +10,23 @@ import (
 )
 
 func Installed(productID string) bool {
-	key := fmt.Sprintf(`Software\Microsoft\Windows\CurrentVersion\Uninstall\%s`, productID)
-	k, err := registry.OpenKey(registry.LOCAL_MACHINE, key, registry.QUERY_VALUE)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return false
-		}
-
-		log.Fatal(err)
+	keys := []string{
+		fmt.Sprintf(`Software\Microsoft\Windows\CurrentVersion\Uninstall\%s`, productID),
+		fmt.Sprintf(`Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%s`, productID),
 	}
-	defer k.Close()
+	for _, key := range keys {
+		k, err := registry.OpenKey(registry.LOCAL_MACHINE, key, registry.QUERY_VALUE)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				continue
+			}
 
-	return true
+			log.Fatal(err)
+		}
+		k.Close()
+
+		return true
+	}
+
+	return false
 }
