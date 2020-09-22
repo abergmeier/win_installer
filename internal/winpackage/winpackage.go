@@ -8,14 +8,29 @@ import (
 	"github.com/gonuts/go-shellquote"
 )
 
+func isProductIDInstalled(config map[string]interface{}) bool {
+	productID := ""
+	productConfig, ok := config["product_id"]
+	if !ok || productConfig == nil {
+		return false
+	}
+	productID = productConfig.(string)
+
+	if productID == "" {
+		return false
+	}
+
+	return winreg.Installed(productID)
+}
+
 func Run(config map[string]interface{}) error {
 	path := config["path"].(string)
-	productID := config["product_id"].(string)
-	argumentString := config["arguments"].(string)
 
-	if winreg.Installed(productID) {
+	if isProductIDInstalled(config) {
 		return nil
 	}
+
+	argumentString := config["arguments"].(string)
 
 	arguments, err := shellquote.Split(argumentString)
 	if err != nil {
