@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/abergmeier/winsible/internal/gcstorage"
+	"github.com/abergmeier/winsible/internal/unarchive"
 	"github.com/abergmeier/winsible/internal/winpackage"
 )
 
@@ -30,6 +31,8 @@ func MustRun(config []interface{}) {
 		for k, v := range taskConfig {
 			if k == "gc_storage" {
 				run = gcstorage.Run
+			} else if k == "unarchive" {
+				run = unarchive.Run
 			} else if k == "win_package" {
 				run = winpackage.Run
 			}
