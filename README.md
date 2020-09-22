@@ -14,3 +14,4 @@ Some more facts:
 - Runs local only - no remote exec
 - Written in Go
 - No dependencies
+- Runs on Wine
