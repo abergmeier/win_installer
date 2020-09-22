@@ -12,8 +12,12 @@ import (
 	"github.com/abergmeier/winsible/internal/filehash"
 )
 
-func Run(config map[string]interface{}) {
-	bucketName := config["bucket"].(string)
+func Run(config map[string]interface{}) error {
+	bucketConfig, ok := config["bucket"]
+	if !ok {
+		return errors.New("Missing bucket config")
+	}
+	bucketName := bucketConfig.(string)
 	objectPath := config["object"].(string)
 	dest := config["dest"].(string)
 	mode := config["mode"].(string)
@@ -38,7 +42,7 @@ func Run(config map[string]interface{}) {
 		downloaded, err := isDownloaded(dest, attrs.MD5)
 		if err == nil {
 			if downloaded {
-				return // Already done
+				return nil // Already done
 			}
 		} else {
 			log.Print("Could not check local MD5 - falling back to downloading")
@@ -64,7 +68,7 @@ func Run(config map[string]interface{}) {
 		log.Fatal(err)
 	}
 
-	w.Sync()
+	return w.Sync()
 }
 
 func isDownloaded(dest string, md5Hash []byte) (bool, error) {

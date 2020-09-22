@@ -2,6 +2,7 @@ package executor
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/abergmeier/winsible/internal/gcstorage"
@@ -24,7 +25,7 @@ func MustRun(config []interface{}) {
 		taskConfig := c.(map[string]interface{})
 
 		var vConfig map[string]interface{}
-		var run func(map[string]interface{})
+		var run func(map[string]interface{}) error
 
 		for k, v := range taskConfig {
 			if k == "gc_storage" {
@@ -42,7 +43,10 @@ func MustRun(config []interface{}) {
 		name := taskConfig["name"].(string)
 		fillCount := maxNameLength - len(name)
 		fmt.Printf("TASK [%s] ***%s\n", name, strings.Repeat("*", fillCount))
-		run(vConfig)
+		err := run(vConfig)
+		if err != nil {
+			log.Fatalf("Task %s failed: %s", name, err)
+		}
 	}
 
 }

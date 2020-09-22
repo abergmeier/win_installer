@@ -8,13 +8,13 @@ import (
 	"github.com/gonuts/go-shellquote"
 )
 
-func Run(config map[string]interface{}) {
+func Run(config map[string]interface{}) error {
 	path := config["path"].(string)
 	productID := config["product_id"].(string)
 	argumentString := config["arguments"].(string)
 
 	if winreg.Installed(productID) {
-		return
+		return nil
 	}
 
 	arguments, err := shellquote.Split(argumentString)
@@ -24,8 +24,5 @@ func Run(config map[string]interface{}) {
 
 	c := exec.Command(path, arguments...)
 
-	err = c.Run()
-	if err != nil {
-		log.Fatal(err)
-	}
+	return c.Run()
 }
