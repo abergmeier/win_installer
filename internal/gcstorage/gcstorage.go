@@ -17,6 +17,9 @@ func Run(config map[string]interface{}) error {
 	if !ok {
 		return errors.New("Missing bucket config")
 	}
+	if bucketConfig == nil {
+		return errors.New("Missing value in bucket config")
+	}
 	bucketName := bucketConfig.(string)
 	objectPath := config["object"].(string)
 	dest := config["dest"].(string)
