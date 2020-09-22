@@ -2,6 +2,7 @@ package winpackage
 
 import (
 	"os/exec"
+	"strings"
 
 	"github.com/abergmeier/winsible/internal/winreg"
 	"github.com/gonuts/go-shellquote"
@@ -48,7 +49,22 @@ func Run(config map[string]interface{}) error {
 		return err
 	}
 
-	c := exec.Command(path, arguments...)
+	return run(path, arguments...)
 
+}
+
+func run(path string, arguments ...string) error {
+
+	if strings.HasSuffix(strings.ToLower(path), ".msi") {
+		return runMsi(path, arguments...)
+	}
+
+	c := exec.Command(path, arguments...)
+	return c.Run()
+}
+
+func runMsi(path string, arguments ...string) error {
+	arguments = append([]string{"/i", path, "/quiet"}, arguments...)
+	c := exec.Command("msiexec", arguments...)
 	return c.Run()
 }
