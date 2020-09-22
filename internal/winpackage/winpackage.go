@@ -1,12 +1,25 @@
 package winpackage
 
 import (
-	"log"
 	"os/exec"
 
 	"github.com/abergmeier/winsible/internal/winreg"
 	"github.com/gonuts/go-shellquote"
 )
+
+func argumentsFromConfig(config map[string]interface{}) ([]string, error) {
+	argumentConfig, ok := config["arguments"]
+	if !ok || argumentConfig == nil {
+		return []string{}, nil
+	}
+	argumentString := argumentConfig.(string)
+	if argumentString == "" {
+		return []string{}, nil
+	}
+
+	arguments, err := shellquote.Split(argumentString)
+	return arguments, err
+}
 
 func isProductIDInstalled(config map[string]interface{}) bool {
 	productID := ""
@@ -30,11 +43,9 @@ func Run(config map[string]interface{}) error {
 		return nil
 	}
 
-	argumentString := config["arguments"].(string)
-
-	arguments, err := shellquote.Split(argumentString)
+	arguments, err := argumentsFromConfig(config)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	c := exec.Command(path, arguments...)
