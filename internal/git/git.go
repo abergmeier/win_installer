@@ -21,7 +21,24 @@ var (
 	sshRegex = regexp.MustCompile(`(?:ssh://){0,1}(user){0,1}(?:@){0,1}.+/.+`)
 )
 
+type runner struct {
+	userDir string
+}
+
 func Run(config map[string]interface{}) error {
+	var userDir string
+	if runtime.GOOS == "windows" {
+		userDir = os.Getenv("USERPROFILE")
+	} else {
+		userDir = os.Getenv("HOME")
+	}
+
+	return (&runner{
+		userDir: userDir,
+	}).Run(config)
+}
+
+func (r *runner) Run(config map[string]interface{}) error {
 	repoConfig, ok := config["repo"]
 	if !ok {
 		return errors.New("Missing repo config")
@@ -39,7 +56,7 @@ func Run(config map[string]interface{}) error {
 	var auth transport.AuthMethod
 	if needsSSH {
 		var err error
-		auth, err = getSSHAuth(repoURL)
+		auth, err = r.getSSHAuth(repoURL)
 		if err != nil {
 			return err
 		}
@@ -74,14 +91,9 @@ func Run(config map[string]interface{}) error {
 	})
 }
 
-func getSSHPublicKeys(url string) (*gossh.PublicKeys, error) {
+func (r *runner) getSSHPublicKeys(url string) (*gossh.PublicKeys, error) {
 
-	var pk string
-	if runtime.GOOS == "windows" {
-		pk = filepath.Join(os.Getenv("USERPROFILE"), ".ssh", "id_rsa")
-	} else {
-		pk = filepath.Join(os.Getenv("HOME"), ".ssh", "id_rsa")
-	}
+	pk := filepath.Join(r.userDir, ".ssh", "id_rsa")
 
 	matches := sshRegex.FindStringSubmatch(url)
 	if len(matches) == 0 {
@@ -101,6 +113,6 @@ func getSSHPublicKeys(url string) (*gossh.PublicKeys, error) {
 	return &gossh.PublicKeys{User: user, Signer: signer}, nil
 }
 
-func getSSHAuth(url string) (transport.AuthMethod, error) {
-	return getSSHPublicKeys(url)
+func (r *runner) getSSHAuth(url string) (transport.AuthMethod, error) {
+	return r.getSSHPublicKeys(url)
 }
