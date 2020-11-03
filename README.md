@@ -8,6 +8,7 @@ winsible.exe --tasks C:\temp\tasks.yaml
 ```
 Supported Modules:
 - gc_storage
+- git
 - unarchive
 - win_package
 
