@@ -1,6 +1,8 @@
 package git
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestClone(t *testing.T) {
 
@@ -13,4 +15,15 @@ func TestClone(t *testing.T) {
 		t.Fatal(err)
 	}
 
+}
+
+func TestSSHAuth(t *testing.T) {
+	pk, err := getSSHPublicKeys("ssh://user@server/project.git")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if pk.User != "user" {
+		t.Fatalf("Unexpected user: %s", pk.User)
+	}
 }
