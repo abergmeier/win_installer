@@ -30,7 +30,7 @@ func MustRun(config []interface{}) {
 		var run func(map[string]interface{}) error
 
 		for k, v := range taskConfig {
-			if k == "gc_storage" {
+			if k == "community.general.gc_storage" || k == "gc_storage" {
 				run = gcstorage.Run
 			} else if k == "ansible.builtin.git" || k == "git" {
 				run = git.Run
