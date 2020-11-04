@@ -36,7 +36,7 @@ func MustRun(config []interface{}) {
 				run = git.Run
 			} else if k == "ansible.builtin.unarchive" || k == "unarchive" {
 				run = unarchive.Run
-			} else if k == "win_package" {
+			} else if k == "ansible.windows.win_package" || k == "win_package" {
 				run = winpackage.Run
 			}
 
