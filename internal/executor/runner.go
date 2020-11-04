@@ -32,7 +32,7 @@ func MustRun(config []interface{}) {
 		for k, v := range taskConfig {
 			if k == "gc_storage" {
 				run = gcstorage.Run
-			} else if k == "git" {
+			} else if k == "ansible.builtin.git" || k == "git" {
 				run = git.Run
 			} else if k == "unarchive" {
 				run = unarchive.Run
