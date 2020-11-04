@@ -34,7 +34,7 @@ func MustRun(config []interface{}) {
 				run = gcstorage.Run
 			} else if k == "ansible.builtin.git" || k == "git" {
 				run = git.Run
-			} else if k == "unarchive" {
+			} else if k == "ansible.builtin.unarchive" || k == "unarchive" {
 				run = unarchive.Run
 			} else if k == "win_package" {
 				run = winpackage.Run
