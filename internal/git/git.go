@@ -52,6 +52,12 @@ func (r *runner) Run(config map[string]interface{}) error {
 	dest := config["dest"].(string)
 	version := config["version"].(string)
 
+	depthConfig, _ := config["depth"]
+	depth := 0
+	if depthConfig != nil {
+		depth = depthConfig.(int)
+	}
+
 	needsSSH := !strings.HasPrefix(repoURL, "http:") && !strings.HasPrefix(repoURL, "https:")
 	var auth transport.AuthMethod
 	if needsSSH {
@@ -63,8 +69,9 @@ func (r *runner) Run(config map[string]interface{}) error {
 	}
 
 	repo, err := git.PlainClone(dest, false, &git.CloneOptions{
-		Auth: auth,
-		URL:  repoURL,
+		Auth:  auth,
+		URL:   repoURL,
+		Depth: depth,
 	})
 	if err != nil {
 		if !errors.Is(err, git.ErrRepositoryAlreadyExists) {
@@ -75,7 +82,9 @@ func (r *runner) Run(config map[string]interface{}) error {
 		if err != nil {
 			return err
 		}
-		err = repo.Fetch(&git.FetchOptions{})
+		err = repo.Fetch(&git.FetchOptions{
+			Depth: depth,
+		})
 		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
 			return err
 		}
