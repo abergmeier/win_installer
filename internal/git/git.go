@@ -83,6 +83,7 @@ func (r *runner) Run(config map[string]interface{}) error {
 			return fmt.Errorf("Failed accessing git worktree at %s: %s", dest, err)
 		}
 		err = repo.Fetch(&git.FetchOptions{
+			Auth:  auth,
 			Depth: depth,
 		})
 		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
