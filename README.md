@@ -7,10 +7,10 @@ Installer similar to Ansible but running on Windows!
 winsible.exe --tasks C:\temp\tasks.yaml
 ```
 Supported Modules:
-- gc_storage
-- git
-- unarchive
-- win_package
+- ansible.builtin.git
+- ansible.builtin.unarchive
+- ansible.windows.win_package
+- community.general.gc_storage
 
 Some more facts:
 - Runs local only - no remote exec
