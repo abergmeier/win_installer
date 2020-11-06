@@ -2,6 +2,8 @@ module github.com/abergmeier/winsible
 
 go 1.14
 
+replace github.com/go-git/go-git/v5 v5.2.0 => github.com/abergmeier/go-git/v5 v5.0.0-20201106103301-6be754ba63e9
+
 require (
 	cloud.google.com/go/storage v1.11.0
 	github.com/go-git/go-git/v5 v5.2.0
