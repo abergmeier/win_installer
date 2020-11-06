@@ -75,29 +75,38 @@ func (r *runner) Run(config map[string]interface{}) error {
 	})
 	if err != nil {
 		if !errors.Is(err, git.ErrRepositoryAlreadyExists) {
-			return err
+			return fmt.Errorf("Failed cloning %s to %s: %s", repoURL, dest, err)
 		}
 
 		repo, err = git.PlainOpen(dest)
 		if err != nil {
-			return err
+			return fmt.Errorf("Failed accessing git worktree at %s: %s", dest, err)
 		}
 		err = repo.Fetch(&git.FetchOptions{
 			Depth: depth,
 		})
 		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
-			return err
+			if depth == 0 {
+				return fmt.Errorf("Fetch failed: %s", err)
+			} else {
+				return fmt.Errorf("Fetch failed with {depth: %d}: %s", depth, err)
+			}
 		}
 	}
 
 	wt, err := repo.Worktree()
 	if err != nil {
-		return err
+		return fmt.Errorf("Failed returning Worktree: %s", err)
 	}
 
-	return wt.Checkout(&git.CheckoutOptions{
+	err = wt.Checkout(&git.CheckoutOptions{
 		Hash: plumbing.NewHash(version),
 	})
+	if err != nil {
+		return fmt.Errorf("Failed checking out %s: %s", version, err)
+	}
+
+	return nil
 }
 
 func (r *runner) getSSHPublicKeys(url string) (*gossh.PublicKeys, error) {
